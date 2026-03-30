@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+/* Marca: noroeste argentino, monumento, mármol y bronce — legible bajo sol */
+:root {
+  --background: #ede4d8;
+  --background-mid: #e5d9c8;
+  --foreground: #1a1410;
+  --surface: #fff8f0;
+  --surface-warm: #fff2e6;
+  --surface-card: #fffcf5;
+  --brand-wine: #6b1c2c;
+  --brand-wine-deep: #4a121f;
+  --brand-terracotta: #b84a32;
+  --brand-gold: #c6a035;
+  --brand-gold-bright: #e4c76b;
+  --brand-sky: #2a5f6f;
+  --accent: #7a1f2e;
+  --accent-hover: #5c1520;
+  --hero-cream: #fff5e6;
+  --muted: #4a3f38;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-source-serif);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  background-image: radial-gradient(
+      ellipse 120% 80% at 50% -20%,
+      rgba(107, 28, 44, 0.08),
+      transparent 55%
+    ),
+    linear-gradient(180deg, var(--background) 0%, var(--background-mid) 100%);
+  color: var(--foreground);
+  font-family: var(--font-source-serif), "Georgia", "Times New Roman", serif;
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), "Georgia", serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Enlaces: subrayado + color (no solo color) */
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.22em;
+  font-weight: 600;
+}
+
+a:hover {
+  color: var(--accent-hover);
+}
+
+a:focus-visible {
+  outline: 3px solid var(--brand-gold);
+  outline-offset: 3px;
+}
+
+a.brand-wordmark {
+  text-decoration: none;
+  color: var(--brand-wine-deep);
+}
+
+a.brand-wordmark:hover {
+  text-decoration: underline;
+  color: var(--brand-wine);
+}
+
+main a.cta-button {
+  text-decoration: none;
+  color: var(--foreground);
+  background: linear-gradient(180deg, var(--brand-gold-bright) 0%, var(--brand-gold) 100%);
+  border: 2px solid rgba(74, 18, 31, 0.35);
+  box-shadow: 0 4px 18px rgba(74, 18, 31, 0.22);
+}
+
+main a.cta-button:hover {
+  filter: brightness(1.06);
+  color: var(--foreground);
+}
+
+main a.cta-button:focus-visible {
+  outline: 3px solid var(--brand-wine-deep);
+  outline-offset: 4px;
+}
+
+main a.secondary-outline-cta {
+  text-decoration: none;
+  color: var(--brand-wine-deep);
+}
+
+main a.secondary-outline-cta:hover {
+  color: var(--brand-wine-deep);
+}
+
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  z-index: 50;
+  padding: 0.5rem 1rem;
+  background: var(--brand-wine-deep);
+  color: var(--hero-cream);
+  font-weight: 700;
+  text-decoration: underline;
+  transform: translateY(-120%);
+  transition: transform 0.2s ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* Historias a pantalla completa: enlaces sin subrayado de cuerpo */
+.story-root a {
+  text-decoration: none;
+}
+
+/* Texto sobre fondos oscuros de marca (hero / footer) */
+.on-dark a {
+  color: var(--brand-gold-bright);
+}
+
+.on-dark a:hover {
+  color: #fff0c2;
+}
+
+.on-dark a:focus-visible {
+  outline-color: var(--brand-gold-bright);
+}
