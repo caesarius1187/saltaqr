@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { GUEMES_STORIES_AUDIO } from "./guemesStoriesAudio";
 import { GUEMES_STORY_SLIDES, STORY_SLIDE_MS } from "./guemesSlides";
 
 function subscribeReducedMotion(cb: () => void) {
@@ -30,6 +31,10 @@ export function GuemesStoriesExperience() {
   );
   const rafRef = useRef<number | null>(null);
   const startRef = useRef(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const storyRootRef = useRef<HTMLDivElement | null>(null);
+  const [musicOn, setMusicOn] = useState(false);
+  const showMusicControl = GUEMES_STORIES_AUDIO.src.length > 0;
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -37,6 +42,78 @@ export function GuemesStoriesExperience() {
       document.body.style.overflow = "";
     };
   }, []);
+
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    el.volume = GUEMES_STORIES_AUDIO.volume;
+    el.loop = true;
+  }, []);
+
+  /** Autoplay al abrir historias; si el navegador lo bloquea, el primer toque en la pantalla intenta de nuevo. */
+  useEffect(() => {
+    const el = audioRef.current;
+    const root = storyRootRef.current;
+    if (!el || !showMusicControl) return;
+
+    let cancelled = false;
+    let removeFallback: (() => void) | null = null;
+
+    const tryPlay = () => {
+      if (cancelled) return;
+      void el.play().then(() => setMusicOn(true)).catch(() => {
+        if (cancelled || !root) return;
+        const onFirstPointer = () => {
+          if (cancelled) return;
+          void el.play().then(() => setMusicOn(true)).catch(() => {});
+        };
+        root.addEventListener("pointerdown", onFirstPointer, { capture: true, once: true });
+        removeFallback = () => root.removeEventListener("pointerdown", onFirstPointer, true);
+      });
+    };
+
+    if (el.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) tryPlay();
+    else el.addEventListener("canplay", tryPlay, { once: true });
+
+    return () => {
+      cancelled = true;
+      el.removeEventListener("canplay", tryPlay);
+      removeFallback?.();
+    };
+  }, [showMusicControl]);
+
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el || !showMusicControl) return;
+    return () => {
+      el.pause();
+    };
+  }, [showMusicControl]);
+
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el || !showMusicControl) return;
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") {
+        el.pause();
+      } else if (musicOn) {
+        void el.play().catch(() => setMusicOn(false));
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, [musicOn, showMusicControl]);
+
+  const toggleMusic = useCallback(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    if (musicOn) {
+      el.pause();
+      setMusicOn(false);
+      return;
+    }
+    void el.play().then(() => setMusicOn(true)).catch(() => setMusicOn(false));
+  }, [musicOn]);
 
   const goNext = useCallback(() => {
     setIndex((i) => Math.min(i + 1, total - 1));
@@ -99,10 +176,14 @@ export function GuemesStoriesExperience() {
         e.preventDefault();
         window.location.href = "/vida";
       }
+      if (showMusicControl && (e.key === "m" || e.key === "M")) {
+        e.preventDefault();
+        toggleMusic();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [goNext, goPrev]);
+  }, [goNext, goPrev, showMusicControl, toggleMusic]);
 
   const slide = GUEMES_STORY_SLIDES[index];
   const isLast = index === total - 1;
@@ -130,6 +211,7 @@ export function GuemesStoriesExperience() {
 
   return (
     <div
+      ref={storyRootRef}
       className="story-root fixed inset-0 z-[200] flex flex-col text-[var(--hero-cream)]"
       role="region"
       aria-roledescription="historia"
@@ -138,6 +220,17 @@ export function GuemesStoriesExperience() {
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
+      {showMusicControl ? (
+        <audio
+          ref={audioRef}
+          src={GUEMES_STORIES_AUDIO.src}
+          preload="auto"
+          loop
+          aria-hidden
+          className="sr-only"
+        />
+      ) : null}
+
       <div className="pointer-events-none absolute inset-0 bg-black/15" aria-hidden />
 
       <div className="relative z-30 flex shrink-0 items-start justify-between gap-3 px-3 pt-3 sm:px-4">
@@ -167,13 +260,50 @@ export function GuemesStoriesExperience() {
             );
           })}
         </div>
-        <Link
-          href="/vida"
-          className="shrink-0 rounded-full bg-black/25 px-4 py-2 text-base font-bold text-white backdrop-blur-sm hover:bg-black/40 focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-white"
-          aria-label="Cerrar historias y volver a la biografía"
-        >
-          Cerrar
-        </Link>
+        <div className="flex shrink-0 items-center gap-2">
+          {showMusicControl ? (
+            <button
+              type="button"
+              onClick={toggleMusic}
+              className="rounded-full bg-black/25 px-3 py-2 text-white backdrop-blur-sm hover:bg-black/40 focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-white"
+              aria-pressed={musicOn}
+              aria-label={musicOn ? "Silenciar música de fondo" : "Activar música de fondo"}
+            >
+              {musicOn ? (
+                <span className="flex items-center gap-2 text-base font-bold">
+                  <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                  </svg>
+                  <span className="hidden sm:inline">Sonido</span>
+                </span>
+              ) : (
+                <span className="flex items-center gap-2 text-base font-bold">
+                  <svg
+                    className="h-5 w-5 shrink-0 opacity-90"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    aria-hidden
+                  >
+                    <path d="M9 18V5l12-2v13" />
+                    <circle cx="6" cy="18" r="3" />
+                    <circle cx="18" cy="16" r="3" />
+                  </svg>
+                  <span className="hidden sm:inline">Música</span>
+                </span>
+              )}
+            </button>
+          ) : null}
+          <Link
+            href="/vida"
+            className="shrink-0 rounded-full bg-black/25 px-4 py-2 text-base font-bold text-white backdrop-blur-sm hover:bg-black/40 focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-white"
+            aria-label="Cerrar historias y volver a la biografía"
+          >
+            Cerrar
+          </Link>
+        </div>
       </div>
 
       <div className="relative min-h-0 flex-1">
