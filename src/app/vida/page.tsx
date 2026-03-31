@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -9,6 +10,27 @@ export const metadata: Metadata = {
 
 const sectionTitle =
   "border-l-[6px] border-[var(--brand-gold)] pl-4 text-3xl font-bold text-[var(--brand-wine-deep)] sm:text-4xl";
+
+function SectionFigure({ src, alt, caption }: { src: string; alt: string; caption?: string }) {
+  return (
+    <figure className="mt-8 overflow-hidden rounded-2xl border-2 border-[var(--brand-wine)]/20 bg-[var(--surface-card)] shadow-[0_8px_28px_rgba(74,18,31,0.08)]">
+      <div className="relative aspect-[4/3] w-full bg-[var(--surface-warm)]">
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          className="object-contain object-center"
+          sizes="(max-width: 768px) 100vw, 42rem"
+        />
+      </div>
+      {caption ? (
+        <figcaption className="px-4 py-3 text-base leading-snug text-[var(--muted)] sm:text-lg">
+          {caption}
+        </figcaption>
+      ) : null}
+    </figure>
+  );
+}
 
 export default function VidaPage() {
   return (
@@ -80,6 +102,11 @@ export default function VidaPage() {
                 visitante del monumento y despertar el interés por la historia regional.
               </p>
             </div>
+            <SectionFigure
+              src="/guemes/intro-img.jpg"
+              alt="Imagen ilustrativa del retrato o la memoria de Güemes."
+              caption="Retratos, grabados y monumento: formas de recordar a Güemes."
+            />
           </section>
 
           <section id="infancia" tabIndex={-1} className="scroll-mt-24 outline-none">
@@ -90,6 +117,13 @@ export default function VidaPage() {
                 élites locales. Cursó estudios que lo acercaron a la cultura política de su tiempo y
                 tuvo contacto temprano con la realidad fronteriza y militar de la región.
               </p>
+            </div>
+            <SectionFigure
+              src="/guemes/origen-img.jpg"
+              alt="Salta o la región como escenario colonial y político."
+              caption="Salta y el noroeste como escenario político y militar de la época."
+            />
+            <div className="mt-8 space-y-6 text-xl leading-relaxed text-[var(--foreground)] sm:text-2xl">
               <p>
                 En 1810, con la Revolución de Mayo y el proceso que desembocó en el Congreso de
                 Tucumán y la declaración de independencia, el mundo político viró hacia el
@@ -97,6 +131,11 @@ export default function VidaPage() {
                 transitó de la vida civil a responsabilidades militares y de gobierno.
               </p>
             </div>
+            <SectionFigure
+              src="/guemes/1810-img.jpg"
+              alt="Contexto visual de la Revolución de Mayo y las juntas."
+              caption="1810 y el giro hacia el conflicto abierto con el poder español."
+            />
           </section>
 
           <section id="independencia" tabIndex={-1} className="scroll-mt-24 outline-none">
@@ -114,6 +153,11 @@ export default function VidaPage() {
                 amenazas externas y a las tensiones internas del bando patriota.
               </p>
             </div>
+            <SectionFigure
+              src="/guemes/norte-img.jpg"
+              alt="Mapa o escena del frente norte y la campaña militar."
+              caption="El Norte: logística, fronteras y campañas durante la independencia."
+            />
           </section>
 
           <section id="guerra-en-el-norte" tabIndex={-1} className="scroll-mt-24 outline-none">
@@ -126,11 +170,25 @@ export default function VidaPage() {
                 guerra de desgaste: movimientos rápidos, apoyo popular, captación de recursos y
                 hostigamiento constante a columnas realistas que intentaban avanzar hacia el sur.
               </p>
+            </div>
+            <SectionFigure
+              src="/guemes/guerra-gaucha-img.jpg"
+              alt="Milicias, caballería o campaña en el contexto de la guerra en el Norte."
+              caption="Milicias, monte y tácticas de hostigamiento frente a columnas realistas."
+            />
+            <div className="mt-8 space-y-6 text-xl leading-relaxed text-[var(--foreground)] sm:text-2xl">
               <p>
                 Esa estrategia tuvo costos humanos y políticos enormes: la sociedad salteña cargó con
                 tributos, reclutamientos y la violencia de una guerra prolongada. Al mismo tiempo,
                 contribuyó a frenar ofensivas enemigas y ganó tiempo para el proyecto independentista.
               </p>
+            </div>
+            <SectionFigure
+              src="/guemes/costo-img.jpg"
+              alt="Sociedad civil o esfuerzo colectivo durante la guerra."
+              caption="El costo social de sostener una defensa prolongada."
+            />
+            <div className="mt-8 space-y-6 text-xl leading-relaxed text-[var(--foreground)] sm:text-2xl">
               <p>
                 Las relaciones con otras autoridades del gobierno central y con líderes regionales
                 no fueron lineales: hubo momentos de colaboración y de fricción, tema bien
@@ -148,11 +206,23 @@ export default function VidaPage() {
                 —y su interpretación— han sido objeto de estudios que van más allá de lo que este
                 resumen puede abarcar.
               </p>
+            </div>
+            <SectionFigure
+              src="/guemes/herida-img.jpg"
+              alt="Contexto urbano o político del norte en torno a 1821."
+              caption="1821: crisis política y militar en el Norte."
+            />
+            <div className="mt-8 space-y-6 text-xl leading-relaxed text-[var(--foreground)] sm:text-2xl">
               <p>
                 Su muerte marcó el final de una etapa de liderazgo personal muy intensa en Salta y
                 dejó abiertas preguntas sobre la continuidad de la defensa del Norte.
               </p>
             </div>
+            <SectionFigure
+              src="/guemes/muerte-img.jpg"
+              alt="Duelo, iglesia o memoria colectiva en Salta."
+              caption="Duelo, honores y memoria pública."
+            />
           </section>
 
           <section id="legado" tabIndex={-1} className="scroll-mt-24 outline-none">
@@ -170,6 +240,11 @@ export default function VidaPage() {
                 histórico y los usos posteriores de su memoria.
               </p>
             </div>
+            <SectionFigure
+              src="/guemes/legado-img.jpg"
+              alt="Monumento a Güemes y entorno en la ciudad de Salta."
+              caption="El monumento y la ciudad: memoria viva en el espacio público."
+            />
           </section>
 
           <section id="para-saber-mas" tabIndex={-1} className="scroll-mt-24 outline-none">

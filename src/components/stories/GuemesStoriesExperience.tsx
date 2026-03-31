@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { GUEMES_STORY_SLIDES, STORY_SLIDE_MS } from "./guemesSlides";
@@ -194,15 +195,50 @@ export function GuemesStoriesExperience() {
         </div>
 
         <div className="pointer-events-none absolute inset-0 z-20 flex flex-col px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 sm:px-10">
-          <div className="flex flex-1 flex-col justify-center">
-            <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold leading-tight tracking-tight text-white drop-shadow-md sm:text-4xl md:text-5xl">
+          <div
+            className={
+              slide.variant === "image"
+                ? "flex min-h-0 flex-1 flex-col justify-center gap-5"
+                : "flex flex-1 flex-col justify-center"
+            }
+          >
+            <h1
+              className={
+                slide.variant === "image"
+                  ? "font-[family-name:var(--font-display)] text-2xl font-extrabold leading-tight tracking-tight text-white drop-shadow-md sm:text-3xl md:text-4xl"
+                  : "font-[family-name:var(--font-display)] text-3xl font-extrabold leading-tight tracking-tight text-white drop-shadow-md sm:text-4xl md:text-5xl"
+              }
+            >
               {slide.title}
             </h1>
-            <div className="mt-8 space-y-5 text-xl leading-relaxed text-white/95 sm:text-2xl md:text-[1.65rem] md:leading-snug">
-              {slide.lines.map((line) => (
-                <p key={line}>{line}</p>
-              ))}
-            </div>
+            {slide.variant === "image" && slide.image && (
+              <div
+                className="relative mx-auto aspect-[4/3] w-full max-h-[min(52vh,420px)] max-w-2xl shrink-0 overflow-hidden rounded-2xl shadow-lg ring-1 ring-white/20"
+                aria-hidden={slide.image.alt === ""}
+              >
+                <Image
+                  src={slide.image.src}
+                  alt={slide.image.alt}
+                  fill
+                  className="object-contain object-center"
+                  sizes="(max-width: 640px) 100vw, 42rem"
+                  priority={index <= 2}
+                />
+              </div>
+            )}
+            {slide.lines.length > 0 && (
+              <div
+                className={
+                  slide.variant === "image"
+                    ? "space-y-3 text-lg leading-relaxed text-white/90 sm:text-xl md:text-2xl"
+                    : "mt-8 space-y-5 text-xl leading-relaxed text-white/95 sm:text-2xl md:text-[1.65rem] md:leading-snug"
+                }
+              >
+                {slide.lines.map((line) => (
+                  <p key={line}>{line}</p>
+                ))}
+              </div>
+            )}
           </div>
 
           {isLast && (
